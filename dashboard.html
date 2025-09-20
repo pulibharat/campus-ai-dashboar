@@ -1,0 +1,241 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Campus AI Dashboard</title>
+  <style>
+    :root { --bg:#0a1020; --panel:#0f172a; --panel2:#111827; --card:#16233f; --card2:#1f2a44; --text:#e5e7eb; --muted:#93a4c2; --accent:#10b981; --warn:#f59e0b; --brand:#8bc34a; --danger:#ef4444; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family: Inter, system-ui, Arial, sans-serif; }
+    a { color: inherit; }
+    .layout { display:grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+    .sidebar { background:var(--panel); padding:16px; border-right:1px solid #1f2937; }
+    .brand { display:flex; align-items:center; gap:8px; font-weight:800; color:#fff; margin-bottom:16px; }
+    .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--brand); }
+    .nav a { display:block; color:#cbd5e1; text-decoration:none; padding:10px 12px; border-radius:8px; margin-bottom:6px; }
+    .nav a.active, .nav a:hover { background:#1f2937; color:#fff; }
+    .content { padding:16px; }
+    .card { background:var(--card2); border-radius:12px; padding:14px; box-shadow: 0 6px 24px rgba(0,0,0,0.25); }
+    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .badge { display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; }
+    .badge.ok { background: rgba(16,185,129,0.15); color: var(--accent); }
+    .badge.off { background: rgba(245,158,11,0.15); color: var(--warn); }
+    .badge.danger { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .row { display:grid; grid-template-columns: 1.2fr 0.8fr; gap:16px; }
+    .metrics { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
+    .metric { background:var(--panel2); border-radius:10px; padding:10px 12px; }
+    .metric .k { font-size:22px; font-weight:800; }
+    img { width:100%; border-radius:10px; background:#000; }
+    .grid-4 { display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 16px; }
+    .small { background:var(--panel2); padding:10px 12px; border-radius:10px; text-align:center; }
+    .features { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
+    .feature { background:var(--card); border-radius:10px; padding:12px; }
+    .live-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:12px; }
+    .toolbar { display:flex; gap:8px; margin-bottom:8px; align-items:center; }
+    .btn { background:#1f2937; color:#cbd5e1; border:1px solid #374151; padding:6px 10px; border-radius:8px; cursor:pointer; }
+    .btn.active { background:#0ea5e9; color:#fff; border-color:#0ea5e9; }
+    .mv-2x2 { display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; }
+    .mv-3x3 { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; }
+    .pane { background:#0b132b; border-radius:10px; aspect-ratio: 16/9; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .pane img { width:100%; height:100%; object-fit:contain; background:#000; }
+    .placeholder { color:#556; font-size:14px; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand"><span class="dot"></span> Campus AI</div>
+      <div class="nav">
+        <a id="nav-overview" href="?view=overview" class="active">Dashboard</a>
+        <a id="nav-detail" href="?view=detail&model=people">Live Monitoring</a>
+        <a id="nav-mv" href="?view=multiview">Multi View</a>
+      </div>
+      <hr style="border-color:#1f2937; margin:12px 0" />
+      <div id="modelLinks" class="nav"></div>
+    </aside>
+    <main class="content">
+      <div id="view-overview" style="display:none">
+        <div class="card" style="margin-bottom:12px">
+          <h2 style="margin:0 0 8px 0">Project Overview</h2>
+          <div style="color:var(--muted)">Enhance campus safety with AI-powered monitoring: people counting, violence detection, triple riding, unusual activity.</div>
+        </div>
+        <div class="features">
+          <div class="feature"><b>People Counting & ID</b><div style="color:var(--muted); font-size:14px">Live entry/exit and ID verification.</div></div>
+          <div class="feature"><b>Violence Detection</b><div style="color:var(--muted); font-size:14px">Aggression/physical altercation alerts.</div></div>
+          <div class="feature"><b>Triple Riding</b><div style="color:var(--muted); font-size:14px">Unsafe riding detection around campus.</div></div>
+          <div class="feature"><b>Unusual Activity</b><div style="color:var(--muted); font-size:14px">Abnormal behavior monitoring.</div></div>
+        </div>
+        <h3 style="margin:16px 0 8px 0">Live Monitoring</h3>
+        <div class="live-grid" id="liveGrid"></div>
+        <div class="grid-4">
+          <div class="small"><div>People Detected</div><div id="ov-people" class="k">--</div></div>
+          <div class="small"><div>Alerts</div><div id="ov-alerts" class="k">Clear</div></div>
+          <div class="small"><div>Uptime</div><div id="ov-uptime" class="k">--</div></div>
+          <div class="small"><div>System</div><div class="k">99.2%</div></div>
+        </div>
+      </div>
+
+      <div id="view-detail" style="display:none">
+        <div class="row">
+          <div class="card">
+            <div class="header">
+              <h2 id="title" style="margin:0">Model</h2>
+              <span id="status" class="badge off">Offline</span>
+            </div>
+            <div class="pane"><img id="video" src="" alt="Live stream" /></div>
+          </div>
+          <div class="card">
+            <div class="header"><h3 style="margin:0">System Info</h3></div>
+            <div class="metrics">
+              <div class="metric"><div>Uptime</div><div id="uptime" class="k">--</div></div>
+              <div class="metric"><div>FPS</div><div id="fps" class="k">0</div></div>
+              <div class="metric"><div>Up Total</div><div id="up" class="k">0</div></div>
+              <div class="metric"><div>Down Total</div><div id="down" class="k">0</div></div>
+            </div>
+            <div style="margin-top:12px">
+              <canvas id="chart" height="160"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="grid-4">
+          <div class="small"><div>Detections Today</div><div id="today" class="k">0</div></div>
+          <div class="small"><div>Accuracy</div><div id="acc" class="k">98.7%</div></div>
+          <div class="small"><div>Avg Response</div><div id="lat" class="k">45ms</div></div>
+          <div class="small"><div>Monitoring</div><div class="k">24/7</div></div>
+        </div>
+      </div>
+
+      <div id="view-multiview" style="display:none">
+        <div class="card">
+          <div class="toolbar">
+            <button class="btn" data-grid="2x2">2 x 2</button>
+            <button class="btn" data-grid="3x3">3 x 3</button>
+          </div>
+          <div id="mv" class="mv-2x2"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const MODELS = [];
+
+    const qs = new URLSearchParams(location.search);
+    let view = qs.get('view') || 'overview';
+    let model = qs.get('model') || 'people';
+
+    document.getElementById('nav-overview').classList.toggle('active', view==='overview');
+    document.getElementById('nav-detail').classList.toggle('active', view==='detail');
+    document.getElementById('nav-mv').classList.toggle('active', view==='multiview');
+
+    const vOverview = document.getElementById('view-overview');
+    const vDetail = document.getElementById('view-detail');
+    const vMV = document.getElementById('view-multiview');
+    function show(which){ vOverview.style.display = which==='overview'?'block':'none'; vDetail.style.display = which==='detail'?'block':'none'; vMV.style.display = which==='multiview'?'block':'none'; }
+    show(view);
+
+    const links = document.getElementById('modelLinks');
+    const modelsList = (window.MODELS && window.MODELS.length? window.MODELS : ['people','violence','face']);
+    links.innerHTML = modelsList.map(m => `<a href=?view=detail&model=${m} class="${view==='detail'&&m===model?'active':''}">${m}</a>`).join('');
+
+    function buildOverview(){
+      const lg = document.getElementById('liveGrid');
+      lg.innerHTML = modelsList.map((m)=>{
+        return `<a href=?view=detail&model=${m} style="text-decoration:none">
+          <div class="card">
+            <div class="header"><b>${m}</b><span class="badge ok">Live</span></div>
+            <div class="pane"><img src="/stream.mjpg?model=${m}" onerror="this.src='/frame.jpg?model=${m}'"></div>
+          </div>
+        </a>`
+      }).join('');
+    }
+
+    const title = document.getElementById('title');
+    const status = document.getElementById('status');
+    const upEl = document.getElementById('up');
+    const downEl = document.getElementById('down');
+    const fpsEl = document.getElementById('fps');
+    const uptimeEl = document.getElementById('uptime');
+    const startedAt = Date.now();
+    function humanUptime(ms){ const s=Math.floor(ms/1000); const m=Math.floor(s/60); const h=Math.floor(m/60); return `${h}h ${m%60}m`; }
+
+    function setupDetail(){
+      title.textContent = model.charAt(0).toUpperCase() + model.slice(1);
+      const img = document.getElementById('video');
+      // Try MJPEG first, fall back to polling /frame.jpg every 120ms
+      let usePolling = false;
+      img.onerror = () => { usePolling = true; };
+      img.src = '/stream.mjpg?model=' + encodeURIComponent(model);
+
+      if (usePolling) {
+        function swap() { img.src = '/frame.jpg?model=' + encodeURIComponent(model) + '&_=' + Date.now(); }
+        setInterval(swap, 120);
+      }
+
+      const ctx = document.getElementById('chart');
+      const gradient = ctx.getContext('2d').createLinearGradient(0,0,0,160);
+      gradient.addColorStop(0, 'rgba(16,185,129,0.35)');
+      gradient.addColorStop(1, 'rgba(16,185,129,0.02)');
+      const data = { labels: [], datasets: [
+        { label: 'Net Flow', data: [], borderColor: '#10b981', backgroundColor: gradient, fill:true, tension:0.35 }
+      ]};
+      const chart = new Chart(ctx, { type: 'line', data, options: { responsive: true, plugins: { legend: { labels: { color: '#e5e7eb' } } }, scales: { x: { ticks: { color: '#93a4c2' } }, y: { ticks: { color: '#93a4c2' } } } } });
+      let ws;
+      function addPoint(ts, up, down) {
+        data.labels.push(new Date(ts).toLocaleTimeString());
+        const net = (up||0) - (down||0);
+        data.datasets[0].data.push(net);
+        if (data.labels.length > 120) { data.labels.shift(); data.datasets[0].data.shift(); }
+        chart.update('none');
+      }
+      function connectWS() {
+        if (ws) ws.close();
+        const proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
+        ws = new WebSocket(proto + location.host + '/ws/live?model=' + encodeURIComponent(model));
+        ws.onmessage = (ev) => {
+          const p = JSON.parse(ev.data);
+          upEl.textContent = p.up_total ?? 0;
+          downEl.textContent = p.down_total ?? 0;
+          fpsEl.textContent = p.fps ?? 0;
+          uptimeEl.textContent = humanUptime(Date.now()-startedAt);
+          status.textContent = p.online ? 'Normal' : 'Offline';
+          status.className = 'badge ' + (p.online ? 'ok' : 'off');
+          addPoint(p.ts, p.up_total, p.down_total);
+        };
+      }
+      connectWS();
+    }
+
+    function setupMultiview(){
+      const mv = document.getElementById('mv');
+      let mode = '2x2';
+      function render(){
+        mv.className = 'mv-' + mode;
+        const cells = mode==='2x2'? 4 : 9;
+        mv.innerHTML = '';
+        for (let i=0;i<cells;i++){
+          const m = modelsList[i] || null;
+          const img = m ? `<img src="/stream.mjpg?model=${m}" onerror="this.src='/frame.jpg?model=${m}'">` : '<div class="placeholder">Offline</div>';
+          mv.insertAdjacentHTML('beforeend', `<div class="pane">${img}</div>`);
+        }
+      }
+      render();
+      document.querySelectorAll('.btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          document.querySelectorAll('.btn').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          mode = btn.dataset.grid;
+          render();
+        });
+      });
+      document.querySelector('.btn[data-grid="2x2"]').classList.add('active');
+    }
+
+    if (view==='overview') { buildOverview(); }
+    if (view==='detail') { setupDetail(); }
+    if (view==='multiview') { setupMultiview(); }
+  </script>
+</body>
+</html>
