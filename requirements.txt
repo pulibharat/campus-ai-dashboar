@@ -4,5 +4,8 @@ ultralytics
 opencv-python
 numpy
 scikit-image
-
-
+filterpy
+lap
+scipy
+matplotlib
+cvzone
