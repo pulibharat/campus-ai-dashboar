@@ -14,7 +14,15 @@ from fastapi.staticfiles import StaticFiles
 from ultralytics import YOLO
 
 # Local imports
-from sort import Sort
+try:
+    from sort import Sort
+except ImportError:
+    print("Warning: sort.py dependencies not available. Using placeholder tracker.")
+    class Sort:
+        def __init__(self, *args, **kwargs):
+            pass
+        def update(self, detections):
+            return detections
 
 app = FastAPI(title="AI Dashboard")
 app.mount("/static", StaticFiles(directory="."), name="static")
