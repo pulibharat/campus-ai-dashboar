@@ -3,3 +3,6 @@ uvicorn[standard]
 ultralytics
 opencv-python
 numpy
+scikit-image
+
+
