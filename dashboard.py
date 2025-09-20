@@ -29,7 +29,7 @@ app.mount("/static", StaticFiles(directory="."), name="static")
 
 # Configuration
 DEFAULT_VIDEO_SOURCE = "people.mp4"
-YOLO_WEIGHTS = "../Yolo-Weights/yolov8l.pt"
+YOLO_WEIGHTS = "yolov8n.pt"  # Use nano model (smallest)
 CONF_THRESHOLD = 0.3
 MASK_PATH = "mask.png"  # optional
 
