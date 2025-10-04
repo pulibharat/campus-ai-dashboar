@@ -36,3 +36,5 @@ python dashboard.py
 
 ## Deployment
 This project can be deployed to Render, Railway, or any cloud platform that supports Python/FastAPI.
+I have deployed this project on Render.
+You can view it here: https://campus-ai-dashboard.onrender.com
