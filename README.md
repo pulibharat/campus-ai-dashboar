@@ -39,10 +39,7 @@ This project can be deployed to Render, Railway, or any cloud platform that supp
 I have deployed this project on Render.
 You can view it here: https://campus-ai-dashboard.onrender.com
 
-![Demo Video](demo-video.gif)
-
-[Watch full demo video](demo-video.mp4)
-
+[![Demo Video](demo-video.gif)](demo-video.mp4)
 
 
 
