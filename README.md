@@ -42,9 +42,11 @@ You can view it here: https://campus-ai-dashboard.onrender.com
 [Watch the demo video](demo-video.mp4)
 
 <video width="600" controls>
-  <source src="videos/demo-video.mp4" type="video/mp4">
+  <source src="videos/demo-video.gif" type="video/mp4">
 </video>
 
+
+[![Demo Video](demo-video.gif)](demo-video.mp4)
 
 
 
