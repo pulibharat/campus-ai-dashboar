@@ -42,8 +42,8 @@ You can view it here: https://campus-ai-dashboard.onrender.com
 
 [Watch the demo video on youtube](https://youtu.be/nnWjOoPlEwY)
 
+![Demo GIF](demo.gif)
 
-![Demo GIF](Untitled video - Made with Clipchamp.gif)
 
 
 
