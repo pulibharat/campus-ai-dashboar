@@ -20,12 +20,6 @@ pip install -r requirements.txt
 ```bash
 python dashboard.py
 ```
-
-3. Open in browser:
-- Overview: http://localhost:8000/?view=overview
-- Live Monitoring: http://localhost:8000/?view=detail&model=people
-- Multi View: http://localhost:8000/?view=multiview
-
 ## Files
 - `dashboard.py` - Main FastAPI server
 - `dashboard.html` - Web interface
@@ -37,12 +31,12 @@ python dashboard.py
 ## Deployment
 This project can be deployed to Render, Railway, or any cloud platform that supports Python/FastAPI.
 I have deployed this project on Render.
-You can view it here: https://campus-ai-dashboard.onrender.com
+You can view it here: https://campus-vision-dashboard.onrender.com/
 
 
-[Watch the demo video on youtube](https://youtu.be/nnWjOoPlEwY)
 
 ![Demo GIF](demo.gif)
+
 
 
 
